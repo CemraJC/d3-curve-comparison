@@ -1,0 +1,5 @@
+# A devlopment workspace for asset creation (like the favicon)
+__dev/
+
+# Proprietary file sync guff
+*ffs_*
