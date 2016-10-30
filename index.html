@@ -18,5 +18,33 @@
   <body>
     <h1>d3 Curve Visualizer</h1>
 
+    <div id="container">
+      <!-- This will be the mounting point for d3's main chart -->
+      <div id="chart"></div>
+
+      <div class="curves row">
+        <h3>Choose a curve type <small>you can choose multiple</small></h3>
+        <!-- The curve type blocks and their settings will appear in this div -->
+        <div id="curvetypes"></div>
+      </div>
+
+      <div class="dataset row">
+        <h3>Choose a dataset <small>or make your own</small></h3>
+        <!-- This will be the mounting point for the dataset selections and their visualization SVGs -->
+        <div id="datasets"></div>
+      </div>
+
+      <div class="settings row">
+        <h4>Global Settings</h4>
+        <!-- Any (useful) global settings get put here -->
+        <div id="settings"></div>
+      </div>
+    </div>
+
+    <footer>
+        <p>Authored by Jason Cemra (Copyright &copy; 2016)</p>
+        <p>Find this project on <a href="https://github.com/cemrajc/d3-curve-comparison">Github</a>.  A huge thanks to <a href="">Github Pages</a> for providing hosting.</p>
+    </footer>
+
   </body>
 </html>

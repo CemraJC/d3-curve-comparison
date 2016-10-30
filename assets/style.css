@@ -1,0 +1,60 @@
+/* Reset styling and apply better global typefaces */
+html, body {
+    color: #111;
+    font-family: Open Sans, Helvetica, Arial;
+    box-sizing: border-box;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: inherit;
+}
+
+
+/* Make the body element centered */
+body {
+    margin: 0 auto;
+    max-width: 60rem; /* I'm fond of using rem, because it scales well across devices */
+}
+
+/* The main header */
+body > h1 {
+    margin: 2rem 0;
+    text-align: center;
+    border-bottom: 1px solid #222;
+}
+
+/* 
+ * Chart
+ */
+#chart {
+    min-height: 20rem;
+}
+
+
+/* Each row of interactive elements */
+.row {
+    min-height: 5rem;
+    margin: 1rem;
+    padding: 1rem;
+    background: #FCFCFF;
+    border-radius: 6px;
+    border: 1px solid #DDDFF4;
+    box-shadow: 0 2px 4px #DADADA;
+}
+
+h3 small {
+    color: #BFBFBF;
+}
+
+/* Footer with author name and shoutouts */
+footer {
+    margin: 2rem 0;
+    font-size: 0.8rem; /* 80 percent of body font size */
+    color: #C5C5C5;
+}
+
+footer a {
+    color: #60CCDF;
+}
