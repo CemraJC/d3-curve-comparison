@@ -15,6 +15,7 @@ html, body {
 /* Make the body element centered */
 body {
     margin: 0 auto;
+    padding: 0 3rem;
     max-width: 60rem; /* I'm fond of using rem, because it scales well across devices */
 }
 
@@ -23,6 +24,32 @@ body > h1 {
     margin: 2rem 0;
     text-align: center;
     border-bottom: 1px solid #222;
+}
+
+/*
+ * Default Styles For Various Elements
+ */
+
+button {
+    padding: 0.3rem 0.5rem;
+    margin-right: 0.4rem;
+
+    background: #E6EBF7;
+    border: 1px solid #B7BEF0;
+    border-radius: 3px;
+
+    cursor: pointer;
+    transition: background 40ms;
+}
+button:hover {
+    background: #D5DEF0;
+}
+button:active {
+    background: #C1D6EE;
+}
+button:focus {
+    outline: none;
+    border-color: #3C50DF;
 }
 
 /* 
@@ -46,6 +73,44 @@ body > h1 {
 
 h3 small {
     color: #BFBFBF;
+}
+
+/*
+ *
+ * Curvetypes Selection Row
+ *
+ */
+
+#curvetypes .labels {
+    display: flex;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+
+.curvetype--toggle {
+    display: none;
+}
+
+.curvetype {
+    padding: 1.2rem;
+    margin: 0.2rem;
+    flex-grow: 1;
+
+    background: #ececec;
+    color: #5a5a5a;
+    font-family: monospace;
+    text-align: center;
+    border-radius: 2px;
+    box-shadow: 0 2px 4px #cac3c3;
+
+    cursor: pointer;
+}
+
+.curvetype.selected {
+    background: #f7f7f7;
+    color: #111;
+    box-shadow: 0 1px 3px 2px #7a72bd;
 }
 
 /* Footer with author name and shoutouts */
