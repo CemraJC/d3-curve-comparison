@@ -239,6 +239,7 @@ datasets.curvetypes = [
         args: [
             {
                 name: "beta",
+                default: 0.85,
                 scale: d3.scaleLinear().range([0, 1]).clamp(true)
             }
         ]
@@ -248,6 +249,7 @@ datasets.curvetypes = [
         args: [
             {
                 name: "tension",
+                default: 0,
                 scale: d3.scaleLinear().range([0, 1]).clamp(true)
             }
         ]
@@ -257,6 +259,7 @@ datasets.curvetypes = [
         args: [
             {
                 name: "tension",
+                default: 0,
                 scale: d3.scaleLinear().range([0, 1]).clamp(true)
             }
         ]
@@ -266,6 +269,7 @@ datasets.curvetypes = [
         args: [
             {
                 name: "tension",
+                default: 0,
                 scale: d3.scaleLinear().range([0, 1]).clamp(true)
             }
         ]
@@ -275,6 +279,7 @@ datasets.curvetypes = [
         args: [
             {
                 name: "alpha",
+                default: 0.5,
                 scale: d3.scaleLinear().range([0, 1]).clamp(true)
             }
         ]
@@ -284,6 +289,7 @@ datasets.curvetypes = [
         args: [
             {
                 name: "alpha",
+                default: 0.5,
                 scale: d3.scaleLinear().range([0, 1]).clamp(true)
             }
         ]
@@ -293,6 +299,7 @@ datasets.curvetypes = [
         args: [
             {
                 name: "alpha",
+                default: 0.5,
                 scale: d3.scaleLinear().range([0, 1]).clamp(true)
             }
         ]

@@ -52,6 +52,20 @@ button:focus {
     border-color: #3C50DF;
 }
 
+input[type=number] {
+    padding: 0.2rem 0.4rem;
+
+    color: #444;
+    border: 1px solid #333;
+    border-radius: 3px;
+}
+
+input[type=number]:focus {
+    outline: none;
+    border-color: #4796CF;
+    box-shadow: 0 1px 2px #ccc;
+}
+
 /* 
  * Chart
  */
@@ -93,9 +107,12 @@ h3 small {
 }
 
 .curvetype {
+    display: flex;
     padding: 1.2rem;
     margin: 0.2rem;
     flex-grow: 1;
+    flex-direction: column;
+    justify-content: center; /* Vertical centering for the name */
 
     background: #ececec;
     color: #5a5a5a;
@@ -111,6 +128,21 @@ h3 small {
     background: #f7f7f7;
     color: #111;
     box-shadow: 0 1px 3px 2px #7a72bd;
+}
+
+.curvetype--args {
+    margin-top: 0.6rem;
+    text-transform: capitalize;
+}
+
+.curvetype--args label {
+    margin: 0 0.4rem;
+
+    cursor: pointer;
+}
+
+.curvetype--args input {
+    max-width: 4rem;
 }
 
 /*

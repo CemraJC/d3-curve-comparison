@@ -14,17 +14,12 @@ function main() {
 
     // Initialize the curvetypes row, so we know which curves to render and how
     var curvetypes = initializeCurvetypes(rows.curvetypes)
-    var curvetypeState = function() {
-        var state = [];
-        curvetypes.selectAll('.curvetype--toggle').each( function() { state.push({ name: this.id, active: this.checked }) } )
-        return state;
-    }
-    // curvetypes.on('change.showState', () => console.log(curvetypeState()))
 
     // Initialize the settings row, so we can change various behaviours of the application
     var settings = initizalizeSettings(rows.settings)
 
     settings(function(s) { console.log(s) })
+    curvetypes(function(s) { console.log(s) })
 
 }
 
@@ -37,9 +32,9 @@ function main() {
  * and return a data structure describing the ui, so that we can listen for changes.
  * This function is also responsible for the two convenience 'select [stuff]' buttons.
  *
- * @todo Bake in rendering for each curve's parameters (need sliders first)
  * @param root = The DOM element under which ui controls and curve labels are rendered
- * @return root = A d3 element that contains the relevant UI
+ * @return subscribe = A function that accepts a callback to be called when
+ *                     the selection updates. The callback is passed the relevant information
  */
 function initializeCurvetypes(root) {
     var curvetype_list = root.append('div').classed('labels', true).selectAll('.curvetype').data(DATA.curvetypes)
@@ -52,29 +47,52 @@ function initializeCurvetypes(root) {
             .classed('curvetype--toggle', true)
 
     // Add nice looking labels for the user to click on
-    curvetype_list.enter()
+    var labels = curvetype_list.enter()
         .append('label')
             .classed('curvetype', true)
             .attr('for', function (d) { return d.name })
-            .append('h4').text(function (d) { return 'd3.curve' + d.name })
 
+    // If the curvetype has modifyable arguments, then this function adds markup
+    // to allow users to fiddle with them
+    var generateArgs = function(d, i, n) {
+        if (d.args) {
+            var args_container = d3.select(this).append('div').classed('curvetype--args', true);
+            for (var k = 0; k < d.args.length; k++) { // Using k because I need the i parameter
+                var unique_id = d.args[k].name + '-' + i;
+                args_container.append('label').attr('for', unique_id).text(d.args[k].name);
+                args_container.append('input')
+                    .attr('id', unique_id)
+                    .attr('type', 'number')
+                    .attr('step', '0.01')
+                    .attr('min', 0)
+                    .attr('max', 1)
+                    .attr('value', d.args[k].default)
+            }
+            return args_container;
+        }
+    }
+
+    labels.append('h4').text(function (d) { return 'd3.curve' + d.name })
+    labels.each(generateArgs)
 
     // Add a select all button
     root.datum(DATA.curvetypes)
         .append('button')
             .text('Select All')
-            .on('click', function(d) {
+            .on('click', function (d) {
                 root.selectAll('.curvetype--toggle').property('checked', true)
                 root.selectAll('.curvetype').classed('selected', true)
+                callSubs() // Need to do this manually to ensure correct order
             })
 
     // Add a select none button
     root.datum(DATA.curvetypes)
         .append('button')
             .text('Select None')
-            .on('click', function(d) {
+            .on('click', function (d) {
                 root.selectAll('.curvetype--toggle').property('checked', false)
                 root.selectAll('.curvetype').classed('selected', false)
+                callSubs() // Need to do this manually to ensure correct order
             })
 
     // Add an event listener to toggle label styles depending on checkbox values
@@ -82,7 +100,42 @@ function initializeCurvetypes(root) {
         root.select('.curvetype[for=' + this.id + ']').classed('selected', this.checked)
     })
 
-    return root;
+    // A function to pull the relevant info out of the UI
+    var getCurvetypeState = function () {
+        var state = [];
+        var toggles = root.selectAll('.labels > input[type=checkbox]');
+
+        toggles.each(function(d) {
+            var obj = {}
+            obj.name = d.name
+            obj.active = this.checked
+
+            obj.args = [];
+            root.select('label[for=' + d.name + ']').select('.curvetype--args input')
+                .each(function (d) {
+                    obj.args.push({ name: this.id, value: this.value })
+                })
+
+            state.push(obj)
+        })
+
+        return state
+    }
+
+    var subscribers = [];
+    var callSubs = function() {
+        for(var i = 0; i < subscribers.length; i++) {
+            subscribers[i].call(this, getCurvetypeState())
+        }
+    }
+
+    root.on('change.notifySubscribers', callSubs)
+
+    var subscribe = function (callback) {
+        subscribers.push(callback)
+    }
+
+    return subscribe;
 }
 
 /*
