@@ -15,11 +15,15 @@ function main() {
     // Initialize the curvetypes row, so we know which curves to render and how
     var curvetypes = initializeCurvetypes(rows.curvetypes)
 
+    // Initialize the datasets row, along with dataset parameters
+    var datasets = initializeDatasets(rows.datasets)
+
     // Initialize the settings row, so we can change various behaviours of the application
     var settings = initizalizeSettings(rows.settings)
 
     settings(function(s) { console.log(s) })
     curvetypes(function(s) { console.log(s) })
+    datasets(function (a) { console.log(a) })
 
 }
 
@@ -139,6 +143,119 @@ function initializeCurvetypes(root) {
 }
 
 /*
+ * --- Dataset Row ---
+ *
+ * This function does a few things. It renders the markup for each dataset, along with
+ * a mini preview of the set, generated from a few default parameters. Below each preview
+ * is the name of the dataset (or "custome") and the relevant parameters to fiddle around with it.
+ *
+ * @todo implement the custom dataset renderer
+ * @param root = The DOM element under which to render everything
+ * @return subscribe = a function that takes a callback to be called when the selection changes
+ */
+function initializeDatasets(root) {
+
+    var datasets_container = root.selectAll('.dataset').data(DATA.generated);
+
+    datasets = datasets_container.enter()
+        .append('div').classed('dataset', true)
+
+    /* Add the miniature visualization of example data points */
+    datasets.each(function (d, i, n) {
+        minivis(d.example, d3.select(this))
+    })
+
+
+    /* Add the boxes with name and arg controls */
+    var infos = datasets.append('div').classed('dataset--info', true)
+    infos.append('h4').text(function (d) { return d.name }) // Name
+    infos.each(function (d, i, n) { // Arg controls
+        var root = d3.select(this);
+
+        /* Append each argument with an input and label */
+        for (var i = 0; i < d.args.length; i++) {
+            var unique_id = d.args[i].name + '-' + i;
+
+            var group = root.append('div').classed('dataset--arg', true);
+
+            group.append('label')
+                .attr('for', unique_id)
+                .text(function (d) { return d.args[i].name })
+
+            group.append('input')
+                .attr('id', unique_id)
+                .attr('type', 'number')
+                .attr('value', d.args[i].default)
+                .attr('step', calibrateStepSize(d.args[i].default))
+                .attr('min', d.args[i].scale)
+                .text(function (d) { return d.args[i].name })
+        }
+    });
+
+
+    /* Returns the data object bound to the active curve */
+    var getActiveDataset = function () {
+        var active;
+        datasets.filter('.selected').each( function(d) { active = d } )
+        return active;
+    }
+
+    /* See other implementations of this for explanation */
+    var subscribers = [];
+    var callSubs = function () {
+        for (var i = 0; i < subscribers.length; i++) {
+            subscribers[i].call(this, getActiveDataset())
+        }
+    }
+    var subscribe = function (callback) {
+        subscribers.push(callback);
+    }
+
+    /* Add an event listener to see if changes occur */
+    // @todo fix the change listener - it's not firing properly
+    // @todo add a button to select - not the entire element
+    datasets.on(['click.select', 'change.notifySubscribers'], function (d, i, n) {
+        // @todo check to see if the current selection is equal to the last
+        for (var i = 0; i < n.length; i++) {
+            d3.select(n[i]).classed('selected', false);
+        }
+        d3.select(this).classed('selected', true);
+        callSubs()
+    })
+
+    return subscribe;
+}
+
+/*
+ * Generates a very simple SVG scatterplot
+ * @param data = An array of { x, y } objects
+ * @param root = The element that the SVG will be appended to
+ * @return svg = A super-simple SVG scatterplot of 'data'
+ */
+function minivis(data, root) {
+    var D = { width: 130, height: 130, padding: 30 }
+    var extent_x = d3.extent(data.map( function(p) { return p.x } ))
+    var extent_y = d3.extent(data.map( function(p) { return p.y } ))
+
+    var x = d3.scaleLinear().domain(extent_x).range([D.padding, D.width - D.padding])
+    var y = d3.scaleLinear().domain(extent_y).range([D.padding, D.height - D.padding])
+
+    var svg = root.append('svg')
+                .attr('width', D.width)
+                .attr('height', D.height)
+
+    svg.append('g').classed('points', true).selectAll('.point').data(data)
+        .enter()
+        .append('circle')
+            .classed('point', true)
+            .attr('cx', function (d) { return x(d.x) })
+            .attr('cy', function (d) { return y(d.y) })
+            .attr('r', 2)
+
+    return svg;
+}
+
+/*
  * --- Settings Row ---
  *
  * This function will grab the predefined settings (from DATA) and render them for
@@ -181,6 +298,7 @@ function initizalizeSettings(root) {
     settings_controls.append('input')
             .attr('type', function (d) { return inputType(d.type) })
             .attr('id', function (d) { return wordify(d.name) })
+            .attr('checked', function (d) { return d.default })
 
     // Add labels for each settings
     settings_controls.append('label')
@@ -211,3 +329,19 @@ function initizalizeSettings(root) {
     return subscribe;
 }
 
+
+/*
+ * --- UTILITY FUNCTIONS ---
+ *
+ */
+
+
+// This is used to infer how large the step for a number input should be
+function calibrateStepSize (number) {
+    var after_dp = new String(number).match(/\.[0-9]+$/)
+    if (after_dp !== null) {
+        return 1 / (10 * (after_dp[0].length - 1)) // 0.01 for .xx
+    } else {
+        return number > 10 ? 2 : 1;
+    }
+}

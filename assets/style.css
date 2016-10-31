@@ -147,6 +147,67 @@ h3 small {
 
 /*
  *
+ * Dataset Row
+ *
+ */
+
+#datasets {
+    display: flex;
+
+    overflow-x: auto;
+}
+
+.dataset {
+    min-width: 130px;
+    margin: 2rem 1rem;
+    padding: 1rem;
+
+    background: #F0F1FB;
+    border: 1px solid #DADCEB;
+    border-radius: 3px;
+    box-shadow: 0 3px 6px 1px #E6E6E6;
+}
+
+.dataset.selected {
+    border-color: #444E7B;
+    box-shadow: 0 1px 2px #A8A8A8;
+}
+
+.dataset svg {
+    background: #FAFAFA;
+    border-radius: 4px;
+    border: 1px solid #aaa;
+}
+
+.dataset svg circle {
+    fill: #2393CF;
+}
+
+.dataset--info h4 {
+    margin: 0.5rem 0;
+}
+
+.dataset--info .dataset--arg {
+    display: flex;
+    justify-content: space-between;
+    margin: 0.3rem 0;
+}
+
+.dataset--info .dataset--arg label {
+    margin: 0 0.3rem 0 0;
+
+    font-size: 75%;
+
+    text-transform: capitalize;
+    cursor: pointer;
+}
+
+.dataset--info input[type=number] {
+    max-width: 4rem;
+}
+
+/*
+ *
  * Settings Row
  *
  */

@@ -43,7 +43,7 @@ function generateSin(amplitude, period, cycles, density) {
 
     var sinTransform = function (index) {
         var input = x(index);
-        var output = y(Math.sin(input)); // First, transform the x-value just
+        var output = y(Math.sin(input * (2 * pi) / period)); // First, transform the x-value just
                                          // like on a graph, then perform y-axis scaling
                                          // for amplitude corrections
         return { x: input, y: output }
@@ -56,18 +56,22 @@ function generateSin(amplitude, period, cycles, density) {
 var sin = generatedData("Sinusoidal Curve", generateSin, [
     {
         name: "amplitude",
-        range: d3.scaleLinear().range([0, 100000]).clamp(true)
+        default: 1,
+        scale: d3.scaleLinear().range([0, 100000]).clamp(true)
     },
     {
         name: "period",
+        default: 1,
         scale: d3.scaleLinear().range([0, 50]).clamp(true)
     },
     {
         name: "cycles",
+        default: 1,
         scale: d3.scaleLinear().rangeRound([0, 50]).clamp(true)
     },
     {
         name: "density",
+        default: 16,
         scale: d3.scaleLinear().rangeRound([5, 100]).clamp(true)
     }
 ])
@@ -108,17 +112,20 @@ function generateRandom(seed, amplitude, points) {
     return data.map(randomTransform);
 }
 
-var rand = generatedData("Seeded Random Distribution", generateRandom, [
+var rand = generatedData("Random", generateRandom, [
     {
         name: "seed",
+        default: 11,
         scale: d3.scaleLinear().range([0, 1e7]).clamp(true)
     },
     {
         name: "amplitude",
+        default: 1,
         scale: d3.scaleLinear().range([0, 10000]).clamp(true)
     },
     {
         name: "points",
+        default: 13,
         scale: d3.scaleLinear().rangeRound([4, 1000]).clamp(true)
     }
 ])
@@ -170,15 +177,18 @@ function generateRing(radius1, radius2, density) {
 var ring = generatedData("Rings", generateRing, [
     {
         name: "radius1",
+        default: 0.9,
         scale: d3.scaleLinear().range([0, 1e7]).clamp(true)
     },
     {
         name: "radius2",
+        default: 1.1,
         scale: d3.scaleLinear().range([0, 1e7]).clamp(true)
     },
     {
         name: "density",
-        scale: d3.scaleLinear().rangeRound([3, 100]).clamp(true)
+        default: 12,
+        scale: d3.scaleLinear().rangeRound([4, 100]).clamp(true)
     }
 ])
 
@@ -338,19 +348,31 @@ datasets.curvetypes = [
     }
 ]
 
-/* Add all the dataset generators to the list */
-datasets.generated.push(sin)
-datasets.generated.push(rand)
-datasets.generated.push(ring)
+/* Generate an example dataset (for visualization) */
+var generators = [sin, rand, ring], defaults;
+var getDefaults = function(args) {
+    return args.map( function(a) { return a.default } );
+}
+
+for (var i = 0; i < generators.length; i++) {
+    defaults = getDefaults(generators[i].args)
+    generators[i].example = generators[i].method(...defaults) // TODO: Make this work wih ES5
+
+    /* Add all the dataset generators to the list */
+    datasets.generated.push(generators[i])
+}
+
 
 datasets.settings = [
     {
         name: "Play animations", // Some people may find it annoying or slow, so allow them to turn it off
-        type: "boolean"
+        type: "boolean",
+        default: true
     },
     {
         name: "Show data points", // Maybe they just want a pretty curve?
-        type: "boolean"
+        type: "boolean",
+        default: true
     }
 ]
 
