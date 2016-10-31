@@ -336,4 +336,15 @@ datasets.generated.push(sin)
 datasets.generated.push(rand)
 datasets.generated.push(ring)
 
+datasets.settings = [
+    {
+        name: "Play animations", // Some people may find it annoying or slow, so allow them to turn it off
+        type: "boolean"
+    },
+    {
+        name: "Show data points", // Maybe they just want a pretty curve?
+        type: "boolean"
+    }
+]
+
 window.__DATA__ = datasets
