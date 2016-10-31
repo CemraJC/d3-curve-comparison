@@ -21,7 +21,7 @@ everyone starts somewhere, right?
 For me, this project is one of my humble beginnings where I used my (at the
 time) rudimentary knowledge of d3 to put together a webpage that would allow me
 to play around with different types of curves that are provided by d3 by
-default, and also experiment with custom curves and datasets.
+default, and also experiment with configurable curves and custom datasets.
 
 Regardless of actually visualizing curves, I had a few primary goals that
 decided how I would do development:

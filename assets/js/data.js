@@ -183,27 +183,152 @@ var ring = generatedData("Rings", generateRing, [
 ])
 
 /*
+ * Custom Dataset. Because this is not strictly generated, it is added
+ * as an alternative key. Because a custom dataset still has parameters
+ * (namely, domain and range) it follows a similar format.
+ *
+ * The custom dataset has its own specialized rendering methods that include:
+ *  * Listening for click/touch events to render new points and cause a redraw
+ *  * Rendering a 'clear' button below each axis
+ *  * Putting the domain and range sliders next to each axis
+ */
+
+datasets.custom = {
+    name: "Custom Dataset",
+    method: "custom",
+    args: [
+        {
+            name: "domain",
+            scale: d3.scaleLinear().domain([0, 10000]).rangeRound([0, 1000])
+        },
+        {
+            name: "range",
+            scale: d3.scaleLinear().domain([0, 10000]).rangeRound([0, 1000])
+        },
+    ],
+    note: [
+        {
+            medium: "desktop",
+            message: "Left-click to place a point, Right click to remove it"
+        },
+        {
+            medium: "touch",
+            message: "Touch to place a point, Long press to remove it"
+        }
+    ]
+}
+
+/*
  * The types of curves to be tested
  */
 datasets.curvetypes = [
-    "Basis",
-    "BasisClosed",
-    "BasisOpen",
-    "Bundle",
-    "Cardinal",
-    "CardinalClosed",
-    "CardinalOpen",
-    "CatmullRom",
-    "CatmullRomClosed",
-    "CatmullRomOpen",
-    "Linear",
-    "LinearClosed",
-    "MonotoneX",
-    "MonotoneY",
-    "Natural",
-    "Step",
-    "StepAfter",
-    "StepBefore"
+    {
+        name: "Basis",
+        args: false
+    },
+    {
+        name: "BasisClosed",
+        args: false
+    },
+    {
+        name: "BasisOpen",
+        args: false
+    },
+    {
+        name: "Bundle",
+        args: [
+            {
+                name: "beta",
+                scale: d3.scaleLinear().range([0, 1]).clamp(true)
+            }
+        ]
+    },
+    {
+        name: "Cardinal",
+        args: [
+            {
+                name: "tension",
+                scale: d3.scaleLinear().range([0, 1]).clamp(true)
+            }
+        ]
+    },
+    {
+        name: "CardinalClosed",
+        args: [
+            {
+                name: "tension",
+                scale: d3.scaleLinear().range([0, 1]).clamp(true)
+            }
+        ]
+    },
+    {
+        name: "CardinalOpen",
+        args: [
+            {
+                name: "tension",
+                scale: d3.scaleLinear().range([0, 1]).clamp(true)
+            }
+        ]
+    },
+    {
+        name: "CatmullRom",
+        args: [
+            {
+                name: "alpha",
+                scale: d3.scaleLinear().range([0, 1]).clamp(true)
+            }
+        ]
+    },
+    {
+        name: "CatmullRomClosed",
+        args: [
+            {
+                name: "alpha",
+                scale: d3.scaleLinear().range([0, 1]).clamp(true)
+            }
+        ]
+    },
+    {
+        name: "CatmullRomOpen",
+        args: [
+            {
+                name: "alpha",
+                scale: d3.scaleLinear().range([0, 1]).clamp(true)
+            }
+        ]
+    },
+    {
+        name: "Linear",
+        args: false
+    },
+    {
+        name: "LinearClosed",
+        args: false
+    },
+    {
+        name: "MonotoneX",
+        args: false
+    },
+    {
+        name: "MonotoneY",
+        args: false
+    },
+    {
+        name: "Natural",
+        args: false
+    },
+    {
+        name: "Step",
+        args: false
+    },
+    {
+        name: "StepAfter",
+        args: false
+    },
+    {
+        name: "StepBefore",
+        args: false
+    }
 ]
 
 /* Add all the dataset generators to the list */
