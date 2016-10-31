@@ -12,14 +12,20 @@ function main() {
         settings: d3.select('#settings')
     }
 
+    // Initialize the curvetypes row, so we know which curves to render and how
     var curvetypes = initializeCurvetypes(rows.curvetypes)
     var curvetypeState = function() {
         var state = [];
         curvetypes.selectAll('.curvetype--toggle').each( function() { state.push({ name: this.id, active: this.checked }) } )
         return state;
     }
-
     // curvetypes.on('change.showState', () => console.log(curvetypeState()))
+
+    // Initialize the settings row, so we can change various behaviours of the application
+    var settings = initizalizeSettings(rows.settings)
+
+    settings(function(s) { console.log(s) })
+
 }
 
 
@@ -78,3 +84,77 @@ function initializeCurvetypes(root) {
 
     return root;
 }
+
+/*
+ * --- Settings Row ---
+ *
+ * This function will grab the predefined settings (from DATA) and render them for
+ * configuration to root. If will also return a function that returns the current
+ * state of the settings.
+ *
+ * @param root = As you would expect - this is where to render the settings controls
+ * @return subscribe = A function that accepts a callback as a parameter. When the settings
+ *                     are changed, this function calls the callback with the new settings
+ */
+function initizalizeSettings(root) {
+    // UTILITY FUNCTIONS
+    var getValue = function(node) { // To determine which property of a DOM node gives its relevant value
+        return (node.type === 'checkbox' || node.type === 'radio') ? node.checked : node.value
+    }
+
+    var wordify = function(phrase) { // This is for defining valid IDs
+        return phrase.split(' ').join('-').toLowerCase()
+    }
+
+    var inputType = function(datatype) { // So we know what to render for a given input type
+        switch (datatype) {
+            case "boolean":
+                return "checkbox"
+            case "number":
+                return "number"
+            default:
+                return "text"
+        }
+    }
+
+    // Bind to settings from DATA
+    var settings = root.selectAll('.settings--control').data(DATA.settings)
+
+    // Each setting is contained in a controls group
+    var settings_controls = settings.enter()
+        .append('div').classed('settings--control', true)
+
+    // Add the appropriate input type for each setting
+    settings_controls.append('input')
+            .attr('type', function (d) { return inputType(d.type) })
+            .attr('id', function (d) { return wordify(d.name) })
+
+    // Add labels for each settings
+    settings_controls.append('label')
+            .text( function (d) { return d.name } )
+            .attr('for', function (d) { return wordify(d.name) })
+
+    // Returns a settings object, based on the current state of the UI
+    var getSettings = function () {
+        var settings = [];
+        settings_controls.selectAll('input').each(function (d) { settings.push( { name: d.name, value: getValue(this) } ) })
+        return settings;
+    }
+
+    // This looks complex, but in reality, it's quite simple.
+    // 1. Make an array, which will hold functions
+    // 2. The subscriber function, when called, will add a function to this array
+    // 3. Whenever the settings change, call every function in the array with the new settings
+    var subscribers= [];
+    var subscribe = function(callback) {
+        subscribers.push(callback);
+    }
+    settings_controls.on('change.notifySubscribers', function() {
+        for (var i = 0; i < subscribers.length; i++) {
+            subscribers[i].call(this, getSettings())
+        }
+    })
+
+    return subscribe;
+}
+

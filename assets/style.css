@@ -113,6 +113,34 @@ h3 small {
     box-shadow: 0 1px 3px 2px #7a72bd;
 }
 
+/*
+ *
+ * Settings Row
+ *
+ */
+
+#settings {
+    display: flex;
+}
+
+.settings--control {
+    margin-top: 0.6rem;
+    margin-right: 1rem;
+}
+
+.settings--control label {
+    font-size: 90%;
+
+    cursor: pointer;
+}
+
+.settings--control input[type=checkbox] {
+    vertical-align: middle;
+    margin: 0 0.4rem;
+
+    cursor: pointer;
+}
+
 /* Footer with author name and shoutouts */
 footer {
     margin: 2rem 0;
