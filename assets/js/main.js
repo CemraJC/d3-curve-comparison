@@ -193,11 +193,19 @@ function initializeDatasets(root) {
     });
 
 
-    /* Returns the data object bound to the active curve */
+    /* Returns the data object bound to the active curve along with its arguments arguments */
     var getActiveDataset = function () {
-        var active;
-        datasets.filter('.selected').each( function(d) { active = d } )
-        return active;
+        var active = datasets.filter('.selected');
+        var active_state = active.data()[0]
+
+        // Fill the returned object with the current value of each argument (from the UI)
+        var argname;
+        for (var i = 0; i < active_state.args.length; i++) {
+            argname = active_state.args[i].name;
+            active_state.args[i].value = parseFloat(active.select('#' + argname + '-' + i).property('value')) // Assumption that all are numbers
+        }
+
+        return active_state;
     }
 
     /* See other implementations of this for explanation */
