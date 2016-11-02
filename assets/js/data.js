@@ -98,10 +98,13 @@ function generateRandom(seed, amplitude, points) {
     var y = d3.scaleLinear().domain([0, MOD]).range([0, amplitude]);
 
     var randomTransform = function (index) {
-        var distributeByPrime = function (start) { // A very crude iterative primes distributor (not perfectly random)
+        var distributeByPrime = function (start) { // Crude PRNG - don't use this seriously
             var finish = start;
-                finish = (( finish + seed) * 11835984188504168602) % MOD
-            return finish
+            for (var i = 0; i < 10; i++) {
+                var angle = (finish * start * i * seed + 1) % 10000 / 1000
+                finish = Math.sin(angle);
+            }
+            return finish;
         }
         var input = x(index);
         var output = y(distributeByPrime(index));
@@ -115,7 +118,7 @@ function generateRandom(seed, amplitude, points) {
 var rand = generatedData("Random", generateRandom, [
     {
         name: "seed",
-        default: 11,
+        default: 9,
         scale: d3.scaleLinear().range([0, 1e7]).clamp(true)
     },
     {
