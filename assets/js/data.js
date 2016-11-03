@@ -166,15 +166,23 @@ function generateRing(p) { // p is for params
     }
 
     // Generate the first ring
-    data = data.concat(ring1.map(function (member) {
+
+    ring1 = ring1.map(function (member) {
         return ringTransform(member, p.radius1, 0)
-    }));
+    });
 
     // Generate the second ring
-    data = data.concat(ring2.map(function (member) {
+    ring2 = ring2.map(function (member) {
         var angle_offset = (theta(1) - theta(0)) / 2 // Position the 2nd ring between the points of the first
         return ringTransform(member, p.radius2, angle_offset)
-    }));
+    });
+
+    // Interleave the rings, so lines zig-zag between points
+    // This weird for-loop runs until both arrays are out of elements
+    for (var i = 0; ring1[i] !== undefined || ring2[i] !== undefined; i++) {
+        if (ring1[i] !== undefined) data.push(ring1[i]) // If there's something, push it on!
+        if (ring2[i] !== undefined) data.push(ring2[i]) //                 "
+    }
 
     return data;
 }
