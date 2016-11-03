@@ -230,7 +230,7 @@ function initializeCurvetypes(root) {
             var args_container = d3.select(this).append('div').classed('curvetype--args', true);
             for (var k = 0; k < d.args.length; k++) { // Using k because I need the i parameter
                 var unique_id = d.args[k].name + '-' + i;
-                args_container.append('label').attr('for', unique_id).text(d.args[k].name);
+                args_container.append('span').text(d.args[k].name);
                 args_container.append('input')
                     .attr('id', unique_id)
                     .attr('type', 'number')

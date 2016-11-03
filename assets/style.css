@@ -146,10 +146,8 @@ h3 small {
     text-transform: capitalize;
 }
 
-.curvetype--args label {
+.curvetype--args span {
     margin: 0 0.4rem;
-
-    cursor: pointer;
 }
 
 .curvetype--args input {
