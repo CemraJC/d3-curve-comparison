@@ -135,6 +135,8 @@ function Chart(root) {
         // Loop through the curves that were passed an render them all
         scatterplot.selectAll('.line').remove();
 
+        // @todo figure out how to keep them persistent and animate
+        // their changes.
         var line;
         for (var i = 0; i < curves.length; i++) {
             line = buildCurve(curves[i]);

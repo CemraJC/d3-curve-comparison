@@ -17,6 +17,7 @@ body {
     margin: 0 auto;
     padding: 0 3rem;
     max-width: 60rem; /* I'm fond of using rem, because it scales well across devices */
+    min-width: 30rem;
 }
 
 /* The main header */
@@ -83,9 +84,14 @@ input[type=number]:focus {
     fill: none;
 }
 
+.axis path, .axis .tick line {
+    stroke: #B9B9B9;
+}
+
 /* Each row of interactive elements */
 .row {
     min-height: 5rem;
+    min-width: 15rem;
     margin: 1rem;
     padding: 1rem;
     background: #FCFCFF;
@@ -119,6 +125,7 @@ h3 small {
     display: flex;
     padding: 1.2rem;
     margin: 0.2rem;
+    min-width: 12rem;
     flex-grow: 1;
     flex-direction: column;
     justify-content: center; /* Vertical centering for the name */
@@ -165,7 +172,7 @@ h3 small {
 }
 
 .dataset {
-    min-width: 130px;
+    min-width: 10.5rem;
     margin: 2rem 1rem;
     padding: 1rem;
 
