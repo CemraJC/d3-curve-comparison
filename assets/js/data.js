@@ -33,17 +33,17 @@ function generatedData(name, method, args) {
  * @param cycles    = how many times the sinusoid repeats
  * @param density   = the number of discrete points per cycle. Ideally around 24.
  */
-function generateSin(amplitude, period, cycles, density) {
-    var point_count = cycles * density;
+function generateSin(p) { // p is for params
+    var point_count = p.cycles * p.density;
     var data = d3.range(point_count);
 
     // I could implement these with mathematics, but d3 is easier to understand
-    var x = d3.scaleLinear().domain([0, point_count]).range([0, cycles * period])
-    var y = d3.scaleLinear().domain([-1, 1]).range([-amplitude, amplitude])
+    var x = d3.scaleLinear().domain([0, point_count]).range([0, p.cycles * p.period])
+    var y = d3.scaleLinear().domain([-1, 1]).range([-p.amplitude, p.amplitude])
 
     var sinTransform = function (index) {
         var input = x(index);
-        var output = y(Math.sin(input * (2 * pi) / period)); // First, transform the x-value just
+        var output = y(Math.sin(input * (2 * pi) / p.period)); // First, transform the x-value just
                                          // like on a graph, then perform y-axis scaling
                                          // for amplitude corrections
         return { x: input, y: output }
@@ -76,6 +76,8 @@ var sin = generatedData("Sinusoidal Curve", generateSin, [
     }
 ])
 
+sin.default = true;
+
 
 
 /*
@@ -89,13 +91,13 @@ var sin = generatedData("Sinusoidal Curve", generateSin, [
  * @param amplitude = how "tall" the dataset will be
  * @param points = how many data points to generate
  */
-function generateRandom(seed, amplitude, points) {
-    var data = d3.range(points)
+function generateRandom(p) { // p is for params
+    var data = d3.range(p.points)
     var MOD = 1e8
-    var seed = Math.round(seed * seed / 3 * 10000); // A bit more entropy to work with
+    var seed = Math.round(p.seed * p.seed / 3 * 10000); // A bit more entropy to work with
 
-    var x = d3.scaleLinear().domain([0, points]).rangeRound([0, points]); // Not a very useful scale, but it could change
-    var y = d3.scaleLinear().domain([0, MOD]).range([0, amplitude]);
+    var x = d3.scaleLinear().domain([0, p.points]).rangeRound([0, p.points]); // Not a very useful scale, but it could change
+    var y = d3.scaleLinear().domain([0, MOD]).range([0, p.amplitude]);
 
     var randomTransform = function (index) {
         var distributeByPrime = function (start) { // Crude PRNG - don't use this seriously
@@ -144,13 +146,13 @@ var rand = generatedData("Random", generateRandom, [
  * @param radius2 = the radius of the outer ring
  * @param density = how many points per ring there will be (at least 3).
  */
-function generateRing(radius1, radius2, density) {
+function generateRing(p) { // p is for params
     var data = [];
-    var ring1 = d3.range(density);
-    var ring2 = d3.range(density);
+    var ring1 = d3.range(p.density);
+    var ring2 = d3.range(p.density);
 
     // Turn an integer sequence into an angular sequence for a full circle (overlapping ends)
-    var theta = d3.scaleLinear().domain([0, density - 1]).range([0, 2 * pi]);
+    var theta = d3.scaleLinear().domain([0, p.density - 1]).range([0, 2 * pi]);
 
     var ringTransform = function (index, radius, offset_angle) {
         // Polar Co-ordinates
@@ -165,13 +167,13 @@ function generateRing(radius1, radius2, density) {
 
     // Generate the first ring
     data = data.concat(ring1.map(function (member) {
-        return ringTransform(member, radius1, 0)
+        return ringTransform(member, p.radius1, 0)
     }));
 
     // Generate the second ring
     data = data.concat(ring2.map(function (member) {
         var angle_offset = (theta(1) - theta(0)) / 2 // Position the 2nd ring between the points of the first
-        return ringTransform(member, radius2, angle_offset)
+        return ringTransform(member, p.radius2, angle_offset)
     }));
 
     return data;
@@ -354,12 +356,16 @@ datasets.curvetypes = [
 /* Generate an example dataset (for visualization) */
 var generators = [sin, rand, ring], defaults;
 var getDefaults = function(args) {
-    return args.map( function(a) { return a.default } );
+    var obj = {};
+    for (var i = 0; i < args.length; i++) {
+        obj[args[i].name] = args[i].default
+    }
+    return obj;
 }
 
 for (var i = 0; i < generators.length; i++) {
     defaults = getDefaults(generators[i].args)
-    generators[i].example = generators[i].method(...defaults) // TODO: Make this work wih ES5
+    generators[i].example = generators[i].method(defaults);
 
     /* Add all the dataset generators to the list */
     datasets.generated.push(generators[i])
