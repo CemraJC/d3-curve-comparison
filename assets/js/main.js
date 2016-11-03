@@ -108,6 +108,9 @@ function initializeCurvetypes(root) {
     var getCurvetypeState = function () {
         var state = [];
         var toggles = root.selectAll('.labels > input[type=checkbox]');
+        var beforeHyphen = function (string) {
+            return string.match(/[^-]*/)[0] // Matches anything before the first hyphen
+        }
 
         toggles.each(function(d) {
             var obj = {}
@@ -117,7 +120,8 @@ function initializeCurvetypes(root) {
             obj.args = [];
             root.select('label[for=' + d.name + ']').select('.curvetype--args input')
                 .each(function (d) {
-                    obj.args.push({ name: this.id, value: this.value })
+                    // Note that we assume a format of name-1234 and a value which is a number
+                    obj.args.push({ name: beforeHyphen(this.id), value: parseFloat(this.value) })
                 })
 
             state.push(obj)
