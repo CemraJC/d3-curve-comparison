@@ -57,22 +57,22 @@ var sin = generatedData("Sinusoidal Curve", generateSin, [
     {
         name: "amplitude",
         default: 1,
-        scale: d3.scaleLinear().range([0, 100000]).clamp(true)
+        scale: d3.scaleLinear().domain([0, 100000]).range([0, 100000]).clamp(true)
     },
     {
         name: "period",
         default: 1,
-        scale: d3.scaleLinear().range([0, 50]).clamp(true)
+        scale: d3.scaleLinear().domain([0, 50]).range([0, 50]).clamp(true)
     },
     {
         name: "cycles",
         default: 1,
-        scale: d3.scaleLinear().rangeRound([0, 50]).clamp(true)
+        scale: d3.scaleLinear().domain([0, 20]).rangeRound([0, 20]).clamp(true)
     },
     {
         name: "density",
         default: 16,
-        scale: d3.scaleLinear().rangeRound([5, 100]).clamp(true)
+        scale: d3.scaleLinear().domain([5, 100]).rangeRound([5, 100]).clamp(true)
     }
 ])
 
@@ -121,17 +121,17 @@ var rand = generatedData("Random", generateRandom, [
     {
         name: "seed",
         default: 9,
-        scale: d3.scaleLinear().range([0, 1e7]).clamp(true)
+        scale: d3.scaleLinear().domain([0, 1e7]).range([0, 1e7]).clamp(true)
     },
     {
         name: "amplitude",
         default: 1,
-        scale: d3.scaleLinear().range([0, 10000]).clamp(true)
+        scale: d3.scaleLinear().domain([0, 10000]).range([0, 10000]).clamp(true)
     },
     {
         name: "points",
         default: 13,
-        scale: d3.scaleLinear().rangeRound([4, 1000]).clamp(true)
+        scale: d3.scaleLinear().domain([4, 1000]).rangeRound([4, 1000]).clamp(true)
     }
 ])
 
@@ -191,55 +191,19 @@ var ring = generatedData("Rings", generateRing, [
     {
         name: "radius1",
         default: 0.9,
-        scale: d3.scaleLinear().range([0, 1e7]).clamp(true)
+        scale: d3.scaleLinear().domain([0, 100]).range([0, 100]).clamp(true)
     },
     {
         name: "radius2",
         default: 1.1,
-        scale: d3.scaleLinear().range([0, 1e7]).clamp(true)
+        scale: d3.scaleLinear().domain([0, 100]).range([0, 100]).clamp(true)
     },
     {
         name: "density",
         default: 12,
-        scale: d3.scaleLinear().rangeRound([4, 100]).clamp(true)
+        scale: d3.scaleLinear().domain([4, 100]).rangeRound([4, 100]).clamp(true)
     }
 ])
-
-/*
- * Custom Dataset. Because this is not strictly generated, it is added
- * as an alternative key. Because a custom dataset still has parameters
- * (namely, domain and range) it follows a similar format.
- *
- * The custom dataset has its own specialized rendering methods that include:
- *  * Listening for click/touch events to render new points and cause a redraw
- *  * Rendering a 'clear' button below each axis
- *  * Putting the domain and range sliders next to each axis
- */
-
-datasets.custom = {
-    name: "Custom Dataset",
-    method: "custom",
-    args: [
-        {
-            name: "domain",
-            scale: d3.scaleLinear().domain([0, 10000]).rangeRound([0, 1000])
-        },
-        {
-            name: "range",
-            scale: d3.scaleLinear().domain([0, 10000]).rangeRound([0, 1000])
-        },
-    ],
-    note: [
-        {
-            medium: "desktop",
-            message: "Left-click to place a point, Right click to remove it"
-        },
-        {
-            medium: "touch",
-            message: "Touch to place a point, Long press to remove it"
-        }
-    ]
-}
 
 /*
  * The types of curves to be tested

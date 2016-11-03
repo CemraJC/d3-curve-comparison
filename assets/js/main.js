@@ -64,7 +64,7 @@ function main() {
 
 
 function Chart(root) {
-    var D = { width: 860, height: 300, padding: 20, axis: { left: 30, bottom: 20, right: 20 } }
+    var D = { width: 860, height: 300, padding: 20, axis: { left: 40, bottom: 20, right: 30 } }
     var POINT_RADIUS = 4;
 
     // This object has the parameters to handle animation timing.
@@ -213,7 +213,7 @@ function generateData(dataset) {
     var x;
     for (var i = 0; i < dataset.args.length; i++) {
         x = dataset.args[i]; // For brevity
-        arg_obj[x.name] = x.value;
+        arg_obj[x.name] = x.scale(x.value);
     }
     return dataset.method(arg_obj);
 }
@@ -351,9 +351,8 @@ function initializeCurvetypes(root) {
  *
  * This function does a few things. It renders the markup for each dataset, along with
  * a mini preview of the set, generated from a few default parameters. Below each preview
- * is the name of the dataset (or "custome") and the relevant parameters to fiddle around with it.
+ * is the name of the dataset and the relevant parameters to fiddle around with it.
  *
- * @todo implement the custom dataset renderer
  * @param root = The DOM element under which to render everything
  * @return subscribe = a function that takes a callback to be called when the selection changes
  */
@@ -399,7 +398,8 @@ function initializeDatasets(root) {
                 .attr('type', 'number')
                 .attr('value', d.args[i].default)
                 .attr('step', calibrateStepSize(d.args[i].default))
-                .attr('min', d.args[i].scale)
+                .attr('min', d.args[i].scale.range()[0])
+                .attr('max', d.args[i].scale.range()[1])
                 .text(function (d) { return d.args[i].name })
         }
     });
