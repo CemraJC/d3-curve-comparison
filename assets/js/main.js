@@ -65,17 +65,8 @@ function main() {
 
 function Chart(root) {
     var D = { width: 860, height: 300, padding: 20, axis: { left: 40, bottom: 20, right: 30 } }
-    var POINT_RADIUS = 4;
+    var POINT_RADIUS = 3;
 
-    // This object has the parameters to handle animation timing.
-    // These are pulled out because animation timing is a big deal, and
-    // may change depending on settings.
-    var DUR = {
-        DELAY: 20,
-        POINTS: 1000,
-        AXES: 700,
-        LINE: 600
-    }
 
     // Making the root svg, and mounting it to the `root` parameter.
     var svg = root.append('svg').attr('width', D.width).attr('height', D.height)
@@ -89,6 +80,21 @@ function Chart(root) {
     svg.append('g').classed('axis--y axis', true)
 
     this.render = function (dataset, curves, settings) {
+        // This object has the parameters to handle animation timing.
+        // These are pulled out because animation timing is a big deal, and
+        // may change depending on settings.
+        var DUR = {
+            DELAY: 20,
+            POINTS: 800,
+            AXES: 700,
+            LINE: 600
+        }
+
+        // Disable animations by setting durations to 0 (if the user wants)
+        if (settings.get("Play animations").value === false) {
+            DUR = { POINTS: 0, AXES: 0, LINE: 0, DELAY: 0 }
+        }
+
         // Get data and relevant measurments
         var data = generateData(dataset);
         var extents = getExtentFromPoints(data);
@@ -99,7 +105,7 @@ function Chart(root) {
 
         // Get axis generators (no labels for x-axis)
         var x_axis = d3.axisBottom().scale(x).tickFormat("").tickSizeInner(4)
-        var y_axis = d3.axisLeft().scale(y).ticks(8, ".1s")
+        var y_axis = d3.axisLeft().scale(y).ticks(8, "1s")
 
         // Remove old axes and add the new ones onto the root svg
         svg.select('.axis--x')
@@ -529,10 +535,20 @@ function initizalizeSettings(root) {
             .text( function (d) { return d.name } )
             .attr('for', function (d) { return wordify(d.name) })
 
+    // A method to get settings - needed for later when they're accessed
+    var getSingleSetting = function (name) {
+        for (var i = 0; i < this.length; i++) {
+            if (this[i].name === name) {
+                return this[i]
+            }
+        }
+        return null;
+    }
     // Returns a settings object, based on the current state of the UI
     var getSettings = function () {
         var settings = [];
         settings_controls.selectAll('input').each(function (d) { settings.push( { name: d.name, value: getValue(this) } ) })
+        settings.get = getSingleSetting
         return settings;
     }
 

@@ -102,8 +102,8 @@ function generateRandom(p) { // p is for params
     var randomTransform = function (index) {
         var distributeByPrime = function (start) { // Crude PRNG - don't use this seriously
             var finish = start;
-            for (var i = 0; i < 10; i++) {
-                var angle = (finish * start * i * seed + 1) % 10000 / 1000
+            for (var i = 0; i < 20; i++) {
+                var angle = (finish * start * i * seed + 1) % 10000 / 1000 + 1
                 finish = Math.sin(angle);
             }
             return finish;
@@ -111,7 +111,7 @@ function generateRandom(p) { // p is for params
         var input = x(index);
         var output = y(distributeByPrime(index));
 
-        return { x: input, y: Math.abs(output) }
+        return { x: input, y: output }
     }
 
     return data.map(randomTransform);
