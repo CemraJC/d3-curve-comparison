@@ -11,6 +11,7 @@ function main() {
         datasets: d3.select('#datasets'),
         settings: d3.select('#settings')
     }
+    var chart_root = d3.select('#chart');
 
     // Initialize the curvetypes row, so we know which curves to render and how
     var curvetypes = initializeCurvetypes(rows.curvetypes)
@@ -21,12 +22,68 @@ function main() {
     // Initialize the settings row, so we can change various behaviours of the application
     var settings = initizalizeSettings(rows.settings)
 
-    settings(function(s) { console.log(s) })
-    curvetypes(function(s) { console.log(s) })
-    datasets(function (a) { console.log(a) })
+    settings.subscribe(function(s) { console.log(s) })
+    curvetypes.subscribe(function(s) { console.log(s) })
+    datasets.subscribe(function (a) { console.log(a) })
+
+    // Do a default render pass
+    render(chart_root, datasets.default, curvetypes.default, settings.default)
 
 }
 
+
+/*
+ * --- Render ---
+ *
+ * This is the main function that does all the serious work. It consumes a dataset object
+ * and settings, then will render a scatterplot with the selected curves running through it.
+ *
+ * If the scatterplot is already initialized, then it will transition the axes and points to
+ * fit the new data.
+ *
+ * @param root = Where to render the scatterplot
+ * @param dataset = A standard dataset object
+ * @param curves = An object which contains curves which should be rendered
+ * @param settings = The global settings object
+ */
+
+function render(root, dataset, curves, settings) {
+    var D = { width: 400, height: 300, padding: 20 }
+    var data = generateData(dataset);
+
+    var extents = getExtentFromPoints(data);
+
+    var x = d3.scaleLinear().domain(extents.x).range([0, D.width - D.padding]);
+    var y = d3.scaleLinear().domain(extents.y).range([0, D.height - D.padding])
+
+    var svg = root.append('svg').attr('width', D.width).attr('height', D.height)
+
+    console.log(data)
+}
+
+/*
+ * This function just puts together the arguments, calls
+ * a datasets generation method and returns the results.
+ *
+ * @param dataset = a standard dataset object
+ * @return data = an array of { x, y } objects describing points.
+ */
+function generateData(dataset) {
+    var arg_obj = {};
+    var x;
+    for (var i = 0; i < dataset.args.length; i++) {
+        x = dataset.args[i]; // For brevity
+        arg_obj[x.name] = x.value;
+    }
+    return dataset.method(arg_obj);
+}
+
+
+function getExtentFromPoints(data) {
+    var x_extent = d3.extent(data.map( function (d) { return d.x } ))
+    var y_extent = d3.extent(data.map( function (d) { return d.y } ))
+    return { x: x_extent, y: y_extent }
+}
 
 
 /*
@@ -143,7 +200,7 @@ function initializeCurvetypes(root) {
         subscribers.push(callback)
     }
 
-    return subscribe;
+    return { subscribe: subscribe, default: getCurvetypeState()[0] };
 }
 
 /*
@@ -163,6 +220,13 @@ function initializeDatasets(root) {
 
     datasets = datasets_container.enter()
         .append('div').classed('dataset', true)
+
+    // Set up the default datset properly
+    datasets.each(function (d) {
+        if (d.default === true) {
+            d3.select(this).classed('selected', true)
+        }
+    })
 
     /* Add the miniature visualization of example data points */
     datasets.each(function (d, i, n) {
@@ -238,7 +302,7 @@ function initializeDatasets(root) {
     /* Add an event listener to see if changes occur */
     selector_buttons.on('mousedown.select', selectDataset)
 
-    return subscribe;
+    return { subscribe: subscribe, default: getActiveDataset() };
 }
 
 /*
@@ -341,7 +405,7 @@ function initizalizeSettings(root) {
         }
     })
 
-    return subscribe;
+    return { subscribe: subscribe, default: getSettings() };
 }
 
 
