@@ -120,7 +120,7 @@ function generateRandom(p) { // p is for params
 var rand = generatedData("Random", generateRandom, [
     {
         name: "seed",
-        default: 9,
+        default: 4,
         scale: d3.scaleLinear().domain([0, 1e7]).range([0, 1e7]).clamp(true)
     },
     {
