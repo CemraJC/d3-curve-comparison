@@ -111,7 +111,7 @@ function generateRandom(p) { // p is for params
         var input = x(index);
         var output = y(distributeByPrime(index));
 
-        return { x: input, y: output }
+        return { x: input, y: Math.abs(output) }
     }
 
     return data.map(randomTransform);

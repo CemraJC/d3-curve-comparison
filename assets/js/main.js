@@ -22,12 +22,27 @@ function main() {
     // Initialize the settings row, so we can change various behaviours of the application
     var settings = initizalizeSettings(rows.settings)
 
-    settings.subscribe(function(s) { console.log(s) })
-    curvetypes.subscribe(function(s) { console.log(s) })
-    datasets.subscribe(function (a) { console.log(a) })
+    // Build a default state
+    var state = {
+        dataset: datasets.default,
+        curves: curvetypes.default,
+        settings: settings.default
+    }
 
-    // Do a default render pass
-    render(chart_root, datasets.default, curvetypes.default, settings.default)
+    // Make the Chart and do a default render pass
+    var chart = new Chart(chart_root)
+    chart.renderState(state)
+
+
+    // Handle Changes
+    var update = function (key, value) {
+        state[key] = value
+        chart.renderState(state);
+    }
+
+    settings.subscribe(function (s) { update('settings', s) })
+    curvetypes.subscribe(function(c) { update('curves', c.filter( function(k) { return k.active } )) })
+    datasets.subscribe(function (d) { update('dataset', d) })
 
 }
 
@@ -47,18 +62,109 @@ function main() {
  * @param settings = The global settings object
  */
 
-function render(root, dataset, curves, settings) {
-    var D = { width: 400, height: 300, padding: 20 }
-    var data = generateData(dataset);
 
-    var extents = getExtentFromPoints(data);
+function Chart(root) {
+    var D = { width: 860, height: 300, padding: 20, axis: { left: 30, bottom: 20, right: 20 } }
+    var POINT_RADIUS = 4;
 
-    var x = d3.scaleLinear().domain(extents.x).range([0, D.width - D.padding]);
-    var y = d3.scaleLinear().domain(extents.y).range([0, D.height - D.padding])
+    // This object has the parameters to handle animation timing.
+    // These are pulled out because animation timing is a big deal, and
+    // may change depending on settings.
+    var DUR = {
+        DELAY: 20,
+        POINTS: 1000,
+        AXIS: 700,
+        LINE: 600
+    }
 
+    // Making the root svg, and mounting it to the `root` parameter.
     var svg = root.append('svg').attr('width', D.width).attr('height', D.height)
 
-    console.log(data)
+    // `scatterplot` will be the group which contains all the points.
+    var scatterplot = svg.append('g').classed('scatterplot--data', true)
+        .attr('transform', 'translate(' + D.axis.left + ', 0)')
+
+
+    this.render = function (dataset, curves, settings) {
+        // Get data and relevant measurments
+        var data = generateData(dataset);
+        var extents = getExtentFromPoints(data);
+
+        // Get scales to fit data to graph
+        var x = d3.scaleLinear().domain(extents.x).range([0, D.width - D.padding - D.axis.right]);
+        var y = d3.scaleLinear().domain(extents.y).range([D.height - D.padding, D.padding])
+
+        // Get axis generators (no labels for x-axis)
+        var x_axis = d3.axisBottom().scale(x).tickFormat("").tickSizeInner(4)
+        var y_axis = d3.axisLeft().scale(y)
+
+        // Remove old axes and add the new ones onto the root svg
+        svg.selectAll('.axis').remove();
+        svg.append('g').classed('axis--x axis', true)
+            .call(x_axis)
+            .attr('transform', 'translate(' + D.axis.left + ', ' + y(0) + ')') // Always position at 0 on the y-axis
+        svg.append('g').classed('axis--y axis', true)
+            .call(y_axis)
+            .attr('transform', 'translate(' + D.axis.left + ', 0)')
+
+        // Drawing the points (can be disabled)
+        // ENTER
+        var bound = scatterplot.selectAll('circle').data(data)
+
+        bound.enter()
+            .append('circle')
+                .classed('point', true)
+                .attr('r', 0)
+            .merge(bound) // ENTER + UPDATE
+                .transition().duration(DUR.POINTS / 3)
+                .attr('cx', function (d) { return x(d.x) })
+                .attr('cy', function (d) { return y(d.y) })
+                .transition().duration(DUR.POINTS)
+                .attr('r', POINT_RADIUS)
+
+        bound.exit()
+            .transition().duration(DUR.POINTS)
+            .attr('r', 0)
+            .remove()
+
+        // Loop through the curves that were passed an render them all
+        scatterplot.selectAll('.line').remove();
+        var line;
+        for (var i = 0; i < curves.length; i++) {
+            line = buildCurve(curves[i]);
+            scatterplot.append('path').classed('line', true)
+                .attr('d', line(data.map((d) => [x(d.x), y(d.y)])))
+        }
+    }
+
+    // Just calls render from a state object
+    this.renderState = function (state) {
+        this.render(state.dataset, state.curves, state.settings);
+    }
+}
+
+/*
+ * This function builds a curve factory from a standard curves object
+ *
+ * @param curve = A standard curve object
+ * @return curveFactory = A function that generate paths using d3
+ */
+function buildCurve(curve) {
+    var base = d3['curve' + curve.name]; // The base curve without any arguments
+    var args = curve.args;
+    var built;
+
+    if (args !== false) {
+        var x;
+        built = base;
+        for (var i = 0; i < args.length; i++) {
+            x = args[i];
+            built = built[x.name](x.value) // Plug in the argument
+        }
+    } else {
+        built = base;
+    }
+    return d3.line().curve(built);
 }
 
 /*
@@ -200,7 +306,10 @@ function initializeCurvetypes(root) {
         subscribers.push(callback)
     }
 
-    return { subscribe: subscribe, default: getCurvetypeState()[0] };
+    // Set up the defaults
+    var default_curves = [  ]
+
+    return { subscribe: subscribe, default: default_curves };
 }
 
 /*

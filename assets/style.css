@@ -74,6 +74,17 @@ input[type=number]:focus {
 }
 
 
+.point {
+    stroke: #3D87D1;
+    fill: #BFD5EA;
+}
+
+.line {
+    fill: none;
+    /* Default stroke - the actual color changes based on a map  */
+    stroke: #C84497;
+}
+
 /* Each row of interactive elements */
 .row {
     min-height: 5rem;
