@@ -99,7 +99,7 @@ function Chart(root) {
 
         // Get axis generators (no labels for x-axis)
         var x_axis = d3.axisBottom().scale(x).tickFormat("").tickSizeInner(4)
-        var y_axis = d3.axisLeft().scale(y)
+        var y_axis = d3.axisLeft().scale(y).ticks(8, ".1s")
 
         // Remove old axes and add the new ones onto the root svg
         svg.select('.axis--x')
@@ -120,7 +120,7 @@ function Chart(root) {
                 .classed('point', true)
                 .attr('r', 0)
             .merge(bound) // ENTER + UPDATE
-                .transition().duration(DUR.POINTS / 3).ease(d3.easeCircle)
+                .transition().duration(DUR.POINTS / 3).ease(d3.easeBounceOut)
                 .attr('cx', function (d) { return x(d.x) })
                 .attr('cy', function (d) { return y(d.y) })
                 .transition().duration(DUR.POINTS).ease(d3.easeElasticOut).delay(function (d, i) { return i * (DUR.POINTS * 1 / data.length) })
