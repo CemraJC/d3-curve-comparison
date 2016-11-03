@@ -119,11 +119,12 @@ function Chart(root) {
             .append('circle')
                 .classed('point', true)
                 .attr('r', 0)
+                .attr('cx', function (d) { return x(d3.median(data.map(function(d) { return d.x }))) })
+                .attr('cy', function (d) { return y(0) })
             .merge(bound) // ENTER + UPDATE
-                .transition().duration(DUR.POINTS / 3).ease(d3.easeBounceOut)
+                .transition().duration(DUR.POINTS).delay(function (d, i) { return i * (DUR.POINTS * 1 / data.length) })
                 .attr('cx', function (d) { return x(d.x) })
                 .attr('cy', function (d) { return y(d.y) })
-                .transition().duration(DUR.POINTS).ease(d3.easeElasticOut).delay(function (d, i) { return i * (DUR.POINTS * 1 / data.length) })
                 .attr('r', POINT_RADIUS)
 
         bound.exit()
@@ -133,12 +134,41 @@ function Chart(root) {
 
         // Loop through the curves that were passed an render them all
         scatterplot.selectAll('.line').remove();
+
         var line;
         for (var i = 0; i < curves.length; i++) {
             line = buildCurve(curves[i]);
             scatterplot.append('path').classed('line', true)
-                .attr('d', line(data.map((d) => [x(d.x), y(d.y)])))
+                .attr('stroke', this.colorizeArgs(curves[i].args))
+                .attr('d', line(this.arrayMap(data, { x: x, y: y })))
         }
+    }
+
+    // Turns an { x, y } data object into something that d3 can work with.
+    this.arrayMap = function (data, scales) {
+        scales = scales || { x: d3.scaleIdentity(), y: d3.scaleIdentity() }
+        var result = [];
+        for (var i = 0; i < data.length; i++) {
+            result.push([scales.x(data[i].x), scales.y(data[i].y)])
+        }
+        return result;
+    }
+
+    // Based on an arguments array, this will return a color.
+    // Used for coloring based on argument.
+    this.colorizeArgs = function (args) {
+        var hash = 0;
+        var rainbowColorScale = d3.scaleLinear().domain([0, 0.25, 0.5, 0.75, 1]).range(["red", "green", "blue", "purple", "orange"])
+        var heatColorScale = d3.scaleLinear().domain([0, 0.25, 0.5, 0.75, 1]).range(["#8854A5", "#DB4A35", "#EF9645", "#F45B00", "#FF17EE"])
+
+        if (args.length === 0) {
+            return rainbowColorScale(Math.random());
+        }
+
+        for (var i = 0; i < args.length; i++) {
+            hash += args[i].value
+        }
+        return heatColorScale(hash) // Always between 0 and 1, because of the args themselves
     }
 
     // Just calls render from a state object

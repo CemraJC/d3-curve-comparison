@@ -81,8 +81,6 @@ input[type=number]:focus {
 
 .line {
     fill: none;
-    /* Default stroke - the actual color changes based on a map  */
-    stroke: #C84497;
 }
 
 /* Each row of interactive elements */
