@@ -73,7 +73,7 @@ function Chart(root) {
     var DUR = {
         DELAY: 20,
         POINTS: 1000,
-        AXIS: 700,
+        AXES: 700,
         LINE: 600
     }
 
@@ -84,6 +84,9 @@ function Chart(root) {
     var scatterplot = svg.append('g').classed('scatterplot--data', true)
         .attr('transform', 'translate(' + D.axis.left + ', 0)')
 
+    // Set up containers for the axes
+    svg.append('g').classed('axis--x axis', true)
+    svg.append('g').classed('axis--y axis', true)
 
     this.render = function (dataset, curves, settings) {
         // Get data and relevant measurments
@@ -99,13 +102,14 @@ function Chart(root) {
         var y_axis = d3.axisLeft().scale(y)
 
         // Remove old axes and add the new ones onto the root svg
-        svg.selectAll('.axis').remove();
-        svg.append('g').classed('axis--x axis', true)
-            .call(x_axis)
+        svg.select('.axis--x')
             .attr('transform', 'translate(' + D.axis.left + ', ' + y(0) + ')') // Always position at 0 on the y-axis
-        svg.append('g').classed('axis--y axis', true)
-            .call(y_axis)
+            .transition()
+            .call(x_axis)
+        svg.select('.axis--y')
             .attr('transform', 'translate(' + D.axis.left + ', 0)')
+            .transition().duration(DUR.AXES)
+            .call(y_axis)
 
         // Drawing the points (can be disabled)
         // ENTER
