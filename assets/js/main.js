@@ -120,23 +120,27 @@ function Chart(root) {
         // Drawing the points (can be disabled)
         // ENTER
         var bound = scatterplot.selectAll('circle').data(data)
+        if (settings.get("Show data points").value === true) {
+            bound.enter()
+                .append('circle')
+                    .classed('point', true)
+                    .attr('r', 0)
+                    .attr('cx', function (d) { return x(d3.median(data.map(function(d) { return d.x }))) })
+                    .attr('cy', function (d) { return y(0) })
+                .merge(bound) // ENTER + UPDATE
+                    .transition().duration(DUR.POINTS).delay(function (d, i) { return i * (DUR.POINTS * 1 / data.length) })
+                    .attr('cx', function (d) { return x(d.x) })
+                    .attr('cy', function (d) { return y(d.y) })
+                    .attr('r', POINT_RADIUS)
 
-        bound.enter()
-            .append('circle')
-                .classed('point', true)
+            bound.exit()
+                .transition().duration(DUR.POINTS)
                 .attr('r', 0)
-                .attr('cx', function (d) { return x(d3.median(data.map(function(d) { return d.x }))) })
-                .attr('cy', function (d) { return y(0) })
-            .merge(bound) // ENTER + UPDATE
-                .transition().duration(DUR.POINTS).delay(function (d, i) { return i * (DUR.POINTS * 1 / data.length) })
-                .attr('cx', function (d) { return x(d.x) })
-                .attr('cy', function (d) { return y(d.y) })
-                .attr('r', POINT_RADIUS)
-
-        bound.exit()
-            .transition().duration(DUR.POINTS)
-            .attr('r', 0)
-            .remove()
+                .remove()
+        } else {
+            // Remove all the points with a nice fade out animation
+            scatterplot.selectAll('circle').transition().duration(DUR.POINTS).attr('r', 0).remove();
+        }
 
         // Loop through the curves that were passed an render them all
         scatterplot.selectAll('.line').remove();
