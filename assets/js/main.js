@@ -173,7 +173,8 @@ function initializeDatasets(root) {
     /* Add the boxes with name and arg controls */
     var infos = datasets.append('div').classed('dataset--info', true)
     infos.append('h4').text(function (d) { return d.name }) // Name
-    infos.each(function (d, i, n) { // Arg controls
+    // Argument controls
+    infos.append('div').classed('dataset--arg-group', true).each(function (d, i, n) {
         var root = d3.select(this);
 
         /* Append each argument with an input and label */
@@ -195,9 +196,11 @@ function initializeDatasets(root) {
                 .text(function (d) { return d.args[i].name })
         }
     });
+    // Button to choose the active dataset
+    var selector_buttons = infos.append('button').classed('dataset--select', true).text('Select');
 
 
-    /* Returns the data object bound to the active curve along with its arguments arguments */
+    /* Returns the data object bound to the active curve along with its arguments */
     var getActiveDataset = function () {
         var active = datasets.filter('.selected');
         var active_state = active.data()[0]
@@ -223,17 +226,17 @@ function initializeDatasets(root) {
         subscribers.push(callback);
     }
 
-    /* Add an event listener to see if changes occur */
-    // @todo fix the change listener - it's not firing properly
-    // @todo add a button to select - not the entire element
-    datasets.on(['click.select', 'change.notifySubscribers'], function (d, i, n) {
-        // @todo check to see if the current selection is equal to the last
+    // Add a selected class, and call subs
+    var selectDataset = function (d, i, n) {
         for (var i = 0; i < n.length; i++) {
-            d3.select(n[i]).classed('selected', false);
+            datasets.classed('selected', false);
         }
-        d3.select(this).classed('selected', true);
+        // this is bad.
+        d3.select(this.parentNode.parentNode).classed('selected', true);
         callSubs()
-    })
+    }
+    /* Add an event listener to see if changes occur */
+    selector_buttons.on('mousedown.select', selectDataset)
 
     return subscribe;
 }

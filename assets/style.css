@@ -166,6 +166,8 @@ h3 small {
     border: 1px solid #DADCEB;
     border-radius: 3px;
     box-shadow: 0 3px 6px 1px #E6E6E6;
+
+    transition: border 200ms;
 }
 
 .dataset.selected {
@@ -187,6 +189,10 @@ h3 small {
     margin: 0.5rem 0;
 }
 
+.dataset--info .dataset--arg-group {
+    min-height: 7rem;
+}
+
 .dataset--info .dataset--arg {
     display: flex;
     justify-content: space-between;
@@ -204,6 +210,11 @@ h3 small {
 
 .dataset--info input[type=number] {
     max-width: 4rem;
+}
+
+.dataset--info .dataset--select {
+    margin-top: 0.4rem;
+    width: 100%;
 }
 
 /*
