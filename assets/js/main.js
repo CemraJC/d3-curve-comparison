@@ -120,10 +120,10 @@ function Chart(root) {
                 .classed('point', true)
                 .attr('r', 0)
             .merge(bound) // ENTER + UPDATE
-                .transition().duration(DUR.POINTS / 3)
+                .transition().duration(DUR.POINTS / 3).ease(d3.easeCircle)
                 .attr('cx', function (d) { return x(d.x) })
                 .attr('cy', function (d) { return y(d.y) })
-                .transition().duration(DUR.POINTS)
+                .transition().duration(DUR.POINTS).ease(d3.easeElasticOut).delay(function (d, i) { return i * (DUR.POINTS * 1 / data.length) })
                 .attr('r', POINT_RADIUS)
 
         bound.exit()
