@@ -3,6 +3,8 @@
 To put a long story short, [click here to see the comparison.][1] You need not
 read any further.
 
+![demo-image-of-awesomeness](http://imgur.com/vRLmXdq)
+
 # It works offline!
 
 Go ahead and download the repository as a zip file, then just open up
