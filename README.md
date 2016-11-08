@@ -3,7 +3,7 @@
 To put a long story short, [click here to see the comparison.][1] You need not
 read any further.
 
-![demo-image-of-awesomeness](http://imgur.com/vRLmXdq)
+![d3-curve-comparison-cover-image](http://i.imgur.com/vRLmXdq.png)
 
 # It works offline!
 
